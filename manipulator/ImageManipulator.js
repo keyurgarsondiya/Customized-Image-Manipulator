@@ -5,6 +5,7 @@ import {
 	ScrollView,
 	Modal,
 	View,
+	StyleSheet,
 	Text,
 	SafeAreaView,
 	TouchableOpacity,
@@ -77,6 +78,8 @@ class ExpoImageManipulator extends Component {
 	async componentDidMount() {
 		await this.onConvertImageToEditableSize();
 		this.setCropMode();
+		
+		// this.onCropImage();
 	}
 
 	onGetCorrectSizes = (w, h) => {
@@ -172,6 +175,7 @@ class ExpoImageManipulator extends Component {
 	};
 
 	getCropBounds = (actualWidth, actualHeight) => {
+		console.log('Crop Bounds: ', actualWidth, actualHeight);
 		const imageRatio = actualHeight / actualWidth;
 		let originalHeight = Dimensions.get('window').height - 64;
 		if (isIphoneX()) {
@@ -261,24 +265,34 @@ class ExpoImageManipulator extends Component {
 			allowFlip = true,
 			btnTexts,
 			fixedMask,
+			width,
+			height
 		} = this.props;
 		const { uri, base64, cropMode, processing } = this.state;
+		
 		console.log('Uri Obtained: ' + uri + ', Crop Mode: ' + cropMode);
-		if (
-			uri &&
-			cropWidth !== 0 &&
-			cropHeight !== 0 &&
-			originalHeight !== 0 &&
-			width !== 0
-		) {
-			this.setCropMode();
-		}
+
+		console.log('Width and Height Received: ', width, height);
+		// if(uri) {
+		// 	this.onCropImage();
+		// }
+		// if (
+		// 	uri &&
+		// 	cropWidth !== 0 &&
+		// 	cropHeight !== 0 &&
+		// 	originalHeight !== 0 &&
+		// 	width !== 0
+		// ) {
+		// 	this.setCropMode();
+		// }
 
 		const imageRatio = this.actualSize.height / this.actualSize.width;
-		let originalHeight = Dimensions.get('window').height - 64;
-		if (isIphoneX()) {
-			originalHeight = Dimensions.get('window').height - 122;
-		}
+		// let originalHeight = Dimensions.get('window').height - 64;
+		// if (isIphoneX()) {
+		// 	originalHeight = Dimensions.get('window').height - 122;
+		// }
+
+		let originalHeight = height;
 
 		const cropRatio = originalHeight / width;
 
@@ -286,6 +300,8 @@ class ExpoImageManipulator extends Component {
 			imageRatio < cropRatio ? width : originalHeight / imageRatio;
 		const cropHeight =
 			imageRatio < cropRatio ? width * imageRatio : originalHeight;
+
+		console.log('Crop Width and Height: ', cropWidth, cropHeight);
 
 		const cropInitialTop = (originalHeight - cropHeight) / 2.0;
 		const cropInitialLeft = (width - cropWidth) / 2.0;
@@ -297,47 +313,61 @@ class ExpoImageManipulator extends Component {
 			this.currentPos.top = cropInitialTop;
 			this.currentPos.left = cropInitialLeft;
 		}
-		return this.state.hasError ? (
-			<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-				<Text>Something went Wrong</Text>
-			</View>
-		) : (
-			<View
-				style={{
-					flex: 1,
-					backgroundColor: 'black',
-					width: Dimensions.get('window').width,
-				}}
-			>
-				<AutoHeightImage
-					style={{ backgroundColor: 'black' }}
-					source={{ uri }}
-					resizeMode={imageRatio >= 1 ? 'contain' : 'contain'}
-					width={width}
-					height={originalHeight}
-					// onLayout={this.calculateMaxSizes}
-				/>
-				<ImageCropOverlay
-					onLayoutChanged={(top, left, w, height) => {
-						this.currentSize.width = w;
-						this.currentSize.height = height;
-						this.currentPos.top = top;
-						this.currentPos.left = left;
-					}}
-					initialWidth={(fixedMask && fixedMask.width) || cropWidth}
-					initialHeight={(fixedMask && fixedMask.height) || cropHeight}
-					initialTop={cropInitialTop}
-					initialLeft={cropInitialLeft}
-					minHeight={(fixedMask && fixedMask.height) || 100}
-					minWidth={(fixedMask && fixedMask.width) || 100}
-					borderColor={borderColor}
-				/>
-			</View>
+		return (
+		<View style={styles.container}>
+		<ScrollView
+            style={{ position: 'relative', flex: 1 }}
+            contentContainerStyle={{ backgroundColor: 'black' }}
+            maximumZoomScale={5}
+            minimumZoomScale={0.5}
+            onScroll={this.onHandleScroll}
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            ref={(c) => {
+              this.scrollView = c;
+            }}
+            scrollEventThrottle={16}
+            scrollEnabled={false}
+            pinchGestureEnabled={false}
+            // scrollEnabled={cropMode ? false : true}
+            // pinchGestureEnabled={cropMode ? false : pinchGestureEnabled}
+          >
+			<AutoHeightImage style={{ backgroundColor: 'black' }}
+              source={{ uri }}
+              resizeMode={imageRatio >= 1 ? 'contain' : 'contain'}
+              width={width}
+              height={originalHeight} />
+			{(!!cropMode && !isNaN(cropHeight) && !isNaN(cropWidth)) && (<ImageCropOverlay onLayoutChanged={(top, left, w, height) => {
+                  this.currentSize.width = w;
+                  this.currentSize.height = height;
+                  this.currentPos.top = top;
+                  this.currentPos.left = left;
+                }}
+                initialWidth={(fixedMask && fixedMask.width) || cropWidth}
+                initialHeight={(fixedMask && fixedMask.height) || cropHeight}
+                initialTop={cropInitialTop}
+                initialLeft={cropInitialLeft}
+                minHeight={(fixedMask && fixedMask.height) || 100}
+                minWidth={(fixedMask && fixedMask.width) || 100}
+                borderColor={borderColor} />)}
+				</ScrollView>
+		</View>
 		);
 	}
 }
 
+
+
 export default ExpoImageManipulator;
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+	}
+})
 
 ExpoImageManipulator.defaultProps = {
 	onPictureChoosed: ({ uri, base64 }) => console.log('URI:', uri, base64),

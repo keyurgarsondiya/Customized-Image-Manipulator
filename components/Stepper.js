@@ -6,15 +6,16 @@ import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import ImageManipulator from '../manipulator/ImageManipulator';
 
 // const text = require('../assets/text.jpg');
-const textImage = Asset.fromModule(require('../assets/text.jpg'));
 
 class Stepper extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			isVisible: true,
+			uri: null,
+			
 			width: null,
 			height: null,
-			isVisible: true,
 		};
 	}
 
@@ -23,12 +24,22 @@ class Stepper extends Component {
 		this.setState({ isVisible: !isVisible });
 	};
 
-	componentDidMount() {
-		Image.getSize(
-			textImage.uri,
-			(w, h) => console.log('Width and Height: ', w, h),
-			(e) => console.log('Error: ', e)
-		);
+	async componentDidMount() {
+		
+		const textImage = await Asset.fromModule(require('../assets/text.jpg'));
+		
+		console.log('Text Image: ', textImage);
+		this.setState({uri: textImage.uri}, () => {
+			console.log('Uri: ', this.state.uri);
+			// Image.getSize(
+			// this.state.uri,
+			// (w, h) => {
+			// console.log('Width and Height: ', w, h); 
+			// this.setState({width: w, height: h})
+			// },
+			// (e) => console.log('Error: ', e))
+			});
+	
 	}
 
 	static navigationOptions = {
@@ -42,6 +53,12 @@ class Stepper extends Component {
 			justifyContent: 'center',
 		},
 	};
+
+	onPageLayout = (event) => {
+    const { width, height } = event.nativeEvent.layout;
+    console.log("ON LAYOUT");
+    this.setState({width, height})
+  	};
 
 	onNextStep = () => {
 		console.log('called next step');
@@ -90,9 +107,10 @@ class Stepper extends Component {
 	// };
 
 	render() {
-		console.log('Text Image: ', textImage);
-		const { isVisible } = this.state;
-		const { uri } = textImage;
+		
+		const { uri, isVisible, width, height } = this.state;
+		// console.log('Uri: ', uri);
+		// const { uri } = textImage;
 		return (
 			<View style={styles.container}>
 				<ProgressSteps>
@@ -102,13 +120,15 @@ class Stepper extends Component {
 						onPrevious={this.onPrevStep}
 						scrollViewProps={this.defaultScrollViewProps}
 					>
-						<View style={{ flex: 1 }}>
-							<ImageManipulator
+						<View style={{ flex: 1 }} onLayout={this.onPageLayout}>
+							{uri && (<ImageManipulator
 								photo={{ uri }}
 								isVisible={true}
 								onPictureChoosed={(data) => {
 									console.log(data);
 								}}
+								width={width}
+								height={height}
 								// fixedMask={{ width: 200, height: 200 }}
 								onToggleModal={this.onToggleModal}
 								saveOptions={{
@@ -121,8 +141,8 @@ class Stepper extends Component {
 									crop: 'Cut',
 									processing: 'Processing',
 								}}
-								borderColor='black'
-							/>
+							/>)}
+							{/* <Text>ImageManipulator</Text> */}
 						</View>
 					</ProgressStep>
 					<ProgressStep

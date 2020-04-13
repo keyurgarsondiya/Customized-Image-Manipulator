@@ -37,7 +37,12 @@ class ImageCropOverlay extends React.Component {
         const {
             draggingTL, draggingTM, draggingTR, draggingML, draggingMM, draggingMR, draggingBL, draggingBM, draggingBR, initialTop, initialLeft, initialHeight, initialWidth, offsetTop, offsetLeft,
         } = this.state
-        const style = {}
+        const style = {
+            top: 0,
+            left: 0,
+            width: 0,
+            height: 0,
+        }
 
         style.top = initialTop + ((draggingTL || draggingTM || draggingTR || draggingMM) ? offsetTop : 0)
         style.left = initialLeft + ((draggingTL || draggingML || draggingBL || draggingMM) ? offsetLeft : 0)
@@ -59,9 +64,9 @@ class ImageCropOverlay extends React.Component {
         const { borderColor } = this.props
         return (
             <View {...this.panResponder.panHandlers}
-                style={[{
+                style={{...{
                     flex: 1, justifyContent: 'center', alignItems: 'center', position: 'absolute', borderStyle: 'solid', borderWidth: 2, borderColor, backgroundColor: 'rgb(0,0,0,0.5)',
-                }, style]}
+                }, ...style}}
             >
                 <View style={{
                     flexDirection: 'row', width: '100%', flex: 1 / 3, backgroundColor: 'transparent',
