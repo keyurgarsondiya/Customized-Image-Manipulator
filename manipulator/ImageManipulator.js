@@ -78,7 +78,7 @@ class ExpoImageManipulator extends Component {
 	async componentDidMount() {
 		await this.onConvertImageToEditableSize();
 		this.setCropMode();
-		
+
 		// this.onCropImage();
 	}
 
@@ -266,10 +266,10 @@ class ExpoImageManipulator extends Component {
 			btnTexts,
 			fixedMask,
 			width,
-			height
+			height,
 		} = this.props;
 		const { uri, base64, cropMode, processing } = this.state;
-		
+
 		console.log('Uri Obtained: ' + uri + ', Crop Mode: ' + cropMode);
 
 		console.log('Width and Height Received: ', width, height);
@@ -314,50 +314,52 @@ class ExpoImageManipulator extends Component {
 			this.currentPos.left = cropInitialLeft;
 		}
 		return (
-		<View style={styles.container}>
-		<ScrollView
-            style={{ position: 'relative', flex: 1 }}
-            contentContainerStyle={{ backgroundColor: 'black' }}
-            maximumZoomScale={5}
-            minimumZoomScale={0.5}
-            onScroll={this.onHandleScroll}
-            bounces={false}
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
-            ref={(c) => {
-              this.scrollView = c;
-            }}
-            scrollEventThrottle={16}
-            scrollEnabled={false}
-            pinchGestureEnabled={false}
-            // scrollEnabled={cropMode ? false : true}
-            // pinchGestureEnabled={cropMode ? false : pinchGestureEnabled}
-          >
-			<AutoHeightImage style={{ backgroundColor: 'black' }}
-              source={{ uri }}
-              resizeMode={imageRatio >= 1 ? 'contain' : 'contain'}
-              width={width}
-              height={originalHeight} />
-			{(!!cropMode && !isNaN(cropHeight) && !isNaN(cropWidth)) && (<ImageCropOverlay onLayoutChanged={(top, left, w, height) => {
-                  this.currentSize.width = w;
-                  this.currentSize.height = height;
-                  this.currentPos.top = top;
-                  this.currentPos.left = left;
-                }}
-                initialWidth={(fixedMask && fixedMask.width) || cropWidth}
-                initialHeight={(fixedMask && fixedMask.height) || cropHeight}
-                initialTop={cropInitialTop}
-                initialLeft={cropInitialLeft}
-                minHeight={(fixedMask && fixedMask.height) || 100}
-                minWidth={(fixedMask && fixedMask.width) || 100}
-                borderColor={borderColor} />)}
-				</ScrollView>
-		</View>
+			<ScrollView
+				style={{ position: 'relative', flex: 1 }}
+				contentContainerStyle={{ backgroundColor: 'black' }}
+				maximumZoomScale={5}
+				minimumZoomScale={0.5}
+				onScroll={this.onHandleScroll}
+				bounces={false}
+				showsHorizontalScrollIndicator={false}
+				showsVerticalScrollIndicator={false}
+				ref={(c) => {
+					this.scrollView = c;
+				}}
+				scrollEventThrottle={16}
+				scrollEnabled={false}
+				pinchGestureEnabled={false}
+				// scrollEnabled={cropMode ? false : true}
+				// pinchGestureEnabled={cropMode ? false : pinchGestureEnabled}
+			>
+				<AutoHeightImage
+					style={{ backgroundColor: 'black' }}
+					source={{ uri }}
+					resizeMode={imageRatio >= 1 ? 'contain' : 'contain'}
+					width={width}
+					height={originalHeight}
+				/>
+				{!!cropMode && !isNaN(cropHeight) && !isNaN(cropWidth) && (
+					<ImageCropOverlay
+						onLayoutChanged={(top, left, w, height) => {
+							this.currentSize.width = w;
+							this.currentSize.height = height;
+							this.currentPos.top = top;
+							this.currentPos.left = left;
+						}}
+						initialWidth={(fixedMask && fixedMask.width) || cropWidth}
+						initialHeight={(fixedMask && fixedMask.height) || cropHeight}
+						initialTop={cropInitialTop}
+						initialLeft={cropInitialLeft}
+						minHeight={(fixedMask && fixedMask.height) || 100}
+						minWidth={(fixedMask && fixedMask.width) || 100}
+						borderColor={borderColor}
+					/>
+				)}
+			</ScrollView>
 		);
 	}
 }
-
-
 
 export default ExpoImageManipulator;
 
@@ -366,8 +368,8 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-	}
-})
+	},
+});
 
 ExpoImageManipulator.defaultProps = {
 	onPictureChoosed: ({ uri, base64 }) => console.log('URI:', uri, base64),

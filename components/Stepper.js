@@ -13,7 +13,7 @@ class Stepper extends Component {
 		this.state = {
 			isVisible: true,
 			uri: null,
-			
+
 			width: null,
 			height: null,
 		};
@@ -25,21 +25,19 @@ class Stepper extends Component {
 	};
 
 	async componentDidMount() {
-		
 		const textImage = await Asset.fromModule(require('../assets/text.jpg'));
-		
+
 		console.log('Text Image: ', textImage);
-		this.setState({uri: textImage.uri}, () => {
+		this.setState({ uri: textImage.uri }, () => {
 			console.log('Uri: ', this.state.uri);
 			// Image.getSize(
 			// this.state.uri,
 			// (w, h) => {
-			// console.log('Width and Height: ', w, h); 
+			// console.log('Width and Height: ', w, h);
 			// this.setState({width: w, height: h})
 			// },
 			// (e) => console.log('Error: ', e))
-			});
-	
+		});
 	}
 
 	static navigationOptions = {
@@ -55,10 +53,10 @@ class Stepper extends Component {
 	};
 
 	onPageLayout = (event) => {
-    const { width, height } = event.nativeEvent.layout;
-    console.log("ON LAYOUT");
-    this.setState({width, height})
-  	};
+		const { width, height } = event.nativeEvent.layout;
+		console.log('ON LAYOUT');
+		this.setState({ width, height });
+	};
 
 	onNextStep = () => {
 		console.log('called next step');
@@ -107,7 +105,6 @@ class Stepper extends Component {
 	// };
 
 	render() {
-		
 		const { uri, isVisible, width, height } = this.state;
 		// console.log('Uri: ', uri);
 		// const { uri } = textImage;
@@ -121,27 +118,29 @@ class Stepper extends Component {
 						scrollViewProps={this.defaultScrollViewProps}
 					>
 						<View style={{ flex: 1 }} onLayout={this.onPageLayout}>
-							{uri && (<ImageManipulator
-								photo={{ uri }}
-								isVisible={true}
-								onPictureChoosed={(data) => {
-									console.log(data);
-								}}
-								width={width}
-								height={height}
-								// fixedMask={{ width: 200, height: 200 }}
-								onToggleModal={this.onToggleModal}
-								saveOptions={{
-									compress: 1,
-									format: 'png',
-									base64: true,
-								}}
-								btnTexts={{
-									done: 'Ok',
-									crop: 'Cut',
-									processing: 'Processing',
-								}}
-							/>)}
+							{uri && (
+								<ImageManipulator
+									photo={{ uri }}
+									isVisible={true}
+									onPictureChoosed={(data) => {
+										console.log(data);
+									}}
+									width={width}
+									height={height}
+									// fixedMask={{ width: 200, height: 200 }}
+									onToggleModal={this.onToggleModal}
+									saveOptions={{
+										compress: 1,
+										format: 'png',
+										base64: true,
+									}}
+									btnTexts={{
+										done: 'Ok',
+										crop: 'Cut',
+										processing: 'Processing',
+									}}
+								/>
+							)}
 							{/* <Text>ImageManipulator</Text> */}
 						</View>
 					</ProgressStep>
