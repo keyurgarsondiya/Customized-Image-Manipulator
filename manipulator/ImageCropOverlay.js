@@ -16,7 +16,8 @@ class ImageCropOverlay extends React.Component {
 		initialLeft: this.props.initialLeft,
 		initialWidth: this.props.initialWidth,
 		initialHeight: this.props.initialHeight,
-
+		rootTop: this.props.rootTop,
+		rootLeft: this.props.rootLeft,
 		offsetTop: 0,
 		offsetLeft: 0,
 	};
@@ -394,9 +395,16 @@ class ImageCropOverlay extends React.Component {
 	}
 
 	getTappedItem(x, y) {
-		const { initialLeft, initialTop, initialWidth, initialHeight } = this.state;
-		const xPos = parseInt((x - initialLeft) / (initialWidth / 3));
-		const yPos = parseInt((y - initialTop) / (initialHeight / 3));
+		const {
+			initialLeft,
+			initialTop,
+			initialWidth,
+			initialHeight,
+			rootLeft,
+			rootTop,
+		} = this.state;
+		const xPos = parseInt((x - initialLeft - rootLeft) / (initialWidth / 3));
+		const yPos = parseInt((y - initialTop - rootTop) / (initialHeight / 3));
 
 		const index = yPos * 3 + xPos;
 		// console.log('Gesture State: ', gestureState);
@@ -450,7 +458,7 @@ class ImageCropOverlay extends React.Component {
 	handleStartShouldSetPanResponder = (event) => true;
 
 	// We were granted responder status! Let's update the UI
-	handlePanResponderGrant = (event, gestureState) => {
+	handlePanResponderGrant = (event) => {
 		// console.log(event.nativeEvent.locationX + ', ' + event.nativeEvent.locationY)
 		const { initialLeft, initialTop, initialWidth, initialHeight } = this.state;
 		console.log('Event: ', event.nativeEvent);

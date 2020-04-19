@@ -10,6 +10,8 @@ import {
 	SafeAreaView,
 	TouchableOpacity,
 	YellowBox,
+	UIManager,
+	findNodeHandle,
 } from 'react-native';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
@@ -41,6 +43,8 @@ class ExpoImageManipulator extends Component {
 			processing: false,
 			zoomScale: 1,
 			hasError: false,
+			pageX: null,
+			pageY: null,
 		};
 
 		this.scrollOffset = 0;
@@ -256,6 +260,29 @@ class ExpoImageManipulator extends Component {
 		await this.onConvertImageToEditableSize();
 	}
 
+	measure = () => {
+		UIManager.measure(
+			findNodeHandle(this.scrollView),
+			(x, y, width, height, pageX, pageY) => {
+				console.log(
+					'x: ' +
+						x +
+						', y: ' +
+						y +
+						', width: ' +
+						width +
+						', height: ' +
+						height +
+						', pageX: ' +
+						pageX +
+						', pageY: ' +
+						pageY
+				);
+				this.setState({ pageX, pageY });
+			}
+		);
+	};
+
 	render() {
 		const {
 			isVisible,
@@ -329,6 +356,10 @@ class ExpoImageManipulator extends Component {
 				scrollEventThrottle={16}
 				scrollEnabled={false}
 				pinchGestureEnabled={false}
+				onLayout={({ nativeEvent }) => {
+					this.setState({ measurements: nativeEvent.layout });
+					this.measure();
+				}}
 				// scrollEnabled={cropMode ? false : true}
 				// pinchGestureEnabled={cropMode ? false : pinchGestureEnabled}
 			>
@@ -351,6 +382,8 @@ class ExpoImageManipulator extends Component {
 						initialHeight={(fixedMask && fixedMask.height) || cropHeight}
 						initialTop={cropInitialTop}
 						initialLeft={cropInitialLeft}
+						rootTop={this.state.pageY}
+						rootLeft={this.state.pageX}
 						minHeight={(fixedMask && fixedMask.height) || 100}
 						minWidth={(fixedMask && fixedMask.width) || 100}
 						borderColor={borderColor}
